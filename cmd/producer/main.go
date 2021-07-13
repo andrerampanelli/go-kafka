@@ -14,15 +14,8 @@ func main() {
 
 	Publish("Manda ai", "gopics", producer, nil, deliveryChan)
 
-	e := <-deliveryChan
-	msg := e.(*kafka.Message)
-	if msg.TopicPartition.Error != nil {
-		fmt.Println("Erro ao enviar")
-	} else {
-		fmt.Println("Mensagem enviada: ", msg.TopicPartition)
-	}
+	go DeliveryReport(deliveryChan) // async
 
-	producer.Flush(1000)
 }
 
 func NewKafkaProducer() *kafka.Producer {
@@ -51,4 +44,21 @@ func Publish(msg string, topic string, producer *kafka.Producer, key []byte, del
 	}
 
 	return nil
+}
+
+func DeliveryReport(deliveryChan chan kafka.Event) {
+	for e := range deliveryChan {
+		switch ev := e.(type) {
+		case *kafka.Message:
+			if ev.TopicPartition.Error != nil {
+				fmt.Println("Erro ao enviar")
+			} else {
+				fmt.Println("Mensagem enviada: ", ev.TopicPartition) // topic[partition]@offset
+				/**
+				 * Aqui se faria alguma acao para alertar algum sistema que a acao
+				 * foi realizada com sucesso
+				 */
+			}
+		}
+	}
 }
