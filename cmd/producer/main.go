@@ -20,7 +20,10 @@ func main() {
 
 func NewKafkaProducer() *kafka.Producer {
 	configMap := &kafka.ConfigMap{
-		"bootstrap.servers": "go-kafka_kafka_1:9092",
+		"bootstrap.servers":   "go-kafka_kafka_1:9092",
+		"delivery.timeout.ms": "0",     // infinite timing
+		"acks":                "all",   // [0 (fastest), 1 (medium), all(slowest)]
+		"enable.idempotence":  "false", // true => acks:all || dont repeat a message
 	}
 
 	p, err := kafka.NewProducer(configMap)
