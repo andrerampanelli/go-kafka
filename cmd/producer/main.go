@@ -12,7 +12,7 @@ func main() {
 
 	producer := NewKafkaProducer()
 
-	Publish("Manda ai", "gopics", producer, nil, deliveryChan)
+	Publish("Manda ai", "gopics", producer, []byte("mensageria"), deliveryChan)
 
 	go DeliveryReport(deliveryChan) // async
 
